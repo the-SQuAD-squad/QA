@@ -1,2 +1,0 @@
-# IR-QA
-Code
