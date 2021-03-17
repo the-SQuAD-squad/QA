@@ -5,7 +5,7 @@ This folder contains:
 - `QA.ipynb`: the notebook used for train and evaluate the best model
 ## Experiments:
 - rnn: https://wandb.ai/veri/SQUAD/reports/RNN--Vmlldzo1Mzk2NTU
-- transformers: https://wandb.ai/buio/SQUAD
+- transformers: https://wandb.ai/buio/SQUAD/reports/Transformers-Report--Vmlldzo1Mzk3MjE
 ## Branches
 - `main`: merged from the `huggingface` branch
 - `rnn`: baseline model based on RNN
