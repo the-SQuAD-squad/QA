@@ -3,7 +3,9 @@
 This folder contains:
 - `compute_answer.py`: given the question file, this script will download the best model and save the predictions
 - `QA.ipynb`: the notebook used for train and evaluate the best model
-
+## Experiments:
+- rnn: https://wandb.ai/veri/SQUAD
+- transformers: https://wandb.ai/buio/SQUAD
 ## Branches
 - `main`: merged from the `huggingface` branch
 - `rnn`: baseline model based on RNN
