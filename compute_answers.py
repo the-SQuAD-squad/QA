@@ -11,17 +11,12 @@ import json
 import pandas as pd
 import re
 import string
-import tensorflow_hub as hub
-from tensorflow import keras
-from tensorflow.keras import layers
 
-import matplotlib.pyplot as plt
-from tqdm.notebook import tqdm
-
-os.system("pip install -q transformers")
+os.system("pip install -q \"transformers==4.3\"")
 import transformers
 from transformers import TFBertModel, TFRobertaModel, TFElectraModel, TFLongformerModel
 from transformers import AutoTokenizer
+
 pd.set_option('display.max_colwidth', -1)
 
 def build_model(bert_hf_layer):
@@ -37,22 +32,22 @@ def build_model(bert_hf_layer):
 
     #do_lower_case = bert_layer.resolved_object.do_lower_case.numpy()
 
-    start_logits = layers.Dense(1, name="start_logit", use_bias=False)(sequence_output)
-    start_logits = layers.Flatten(name="flatten_start")(start_logits)
+    start_logits = tf.keras.layers.Dense(1, name="start_logit", use_bias=False)(sequence_output)
+    start_logits = tf.keras.layers.Flatten(name="flatten_start")(start_logits)
 
-    end_logits = layers.Dense(1, name="end_logit", use_bias=False)(sequence_output)
-    end_logits = layers.Flatten(name="flatten_end")(end_logits)
+    end_logits = tf.keras.layers.Dense(1, name="end_logit", use_bias=False)(sequence_output)
+    end_logits = tf.keras.layers.Flatten(name="flatten_end")(end_logits)
 
-    start_probs = layers.Activation(keras.activations.softmax, name="softmax_start")(start_logits)
-    end_probs = layers.Activation(keras.activations.softmax, name="softmax_end")(end_logits)
+    start_probs = tf.keras.layers.Activation(tf.keras.activations.softmax, name="softmax_start")(start_logits)
+    end_probs = tf.keras.layers.Activation(tf.keras.activations.softmax, name="softmax_end")(end_logits)
 
-    model = keras.Model(inputs=[input_word_ids, input_mask, input_type_ids], 
+    model = tf.keras.Model(inputs=[input_word_ids, input_mask, input_type_ids], 
                         outputs=[start_probs, end_probs],
                         name="BERT_QA")
 
-    loss = keras.losses.SparseCategoricalCrossentropy(from_logits=False)
+    loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False)
 
-    optimizer = keras.optimizers.Adam(lr=1e-5, beta_1=0.9, beta_2=0.98, epsilon=1e-9)
+    optimizer = tf.keras.optimizers.Adam(lr=1e-5, beta_1=0.9, beta_2=0.98, epsilon=1e-9)
 
     model.summary(line_length=150)
 
@@ -71,8 +66,6 @@ except:
 
 
 
-#questi non servono?
-##################################
 # fix random seeds
 seed_value = 42 
 os.environ['PYTHONHASHSEED'] = str(seed_value)
@@ -83,8 +76,6 @@ tf.compat.v1.set_random_seed(seed_value)
 session_conf = tf.compat.v1.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
 sess = tf.compat.v1.Session(graph=tf.compat.v1.get_default_graph(), config=session_conf)
 tf.compat.v1.keras.backend.set_session(sess)
-
-###################################
 
 # BERT params
 # hf model and input sequence max length 
@@ -109,7 +100,6 @@ model.load_weights("model-best.h5")
 
 
 # preprocess dev set
-from tqdm.notebook import tqdm
 
 with open(path_to_json_file, "r") as f:
     json_file = json.load(f)
@@ -144,7 +134,7 @@ def labeling(df):
     input_mask = []
     context_token_to_char = []
 
-    for id in tqdm(df.index):
+    for id in df.index:
 
         tokenized_context = df.loc[id]['passage']
         tokenized_question = df.loc[id]['question']
